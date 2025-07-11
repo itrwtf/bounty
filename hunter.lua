@@ -1,5 +1,5 @@
 -- CONFIG
-local webhookURL = "https://discord.com/api/webhooks/your_webhook_here"
+local webhookURL = "https://discord.com/api/webhooks/1384766141905244201/YI9Zf6Eyxmyo4gN0uxQNmzw4bkRhV2mWidD9GnLXcox9Vto6R4Y-EH_MZ9Vomt50Vg7X"
 local bountyAmount = "2500 Robux"
 local gameDuration = 300 -- seconds (5 minutes)
 
